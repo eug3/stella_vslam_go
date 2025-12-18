@@ -1,4 +1,4 @@
-# stella_vslam
+# stella_vslam_go
 
 [![CI](https://github.com/stella-cv/stella_vslam/actions/workflows/main.yml/badge.svg)](https://github.com/stella-cv/stella_vslam/actions/workflows/main.yml)
 [![Documentation Status](https://readthedocs.org/projects/stella-cv/badge/?version=latest)](https://stella-cv.readthedocs.io/en/latest/?badge=latest)
@@ -30,6 +30,8 @@ The notable features are:
 - Created maps can be **stored and loaded**, then stella_vslam can **localize new images** based on the prebuilt maps.
 - The system is fully modular. It is designed by encapsulating several functions in separated components with easy-to-understand APIs.
 - We provided **some code snippets** to understand the core functionalities of this system.
+- **Go bindings** - This fork includes support for Go language bindings via CGO.
+- **Non-blocking export API** - Added thread-safe methods for exporting map database without interrupting tracking.
 
 One of the noteworthy features of stella_vslam is that the system can deal with various type of camera models, such as perspective, fisheye, and equirectangular.
 If needed, users can implement extra camera models (e.g. dual fisheye, catadioptric) with ease.
@@ -79,9 +81,23 @@ Please contact us via [GitHub Discussions](https://github.com/stella-cv/stella_v
 - Implementation of extra camera models
 - Python bindings
 - IMU integration
+- Go bindings and non-blocking export API (added in this fork)
 
 The higher up the list, the higher the priority.
 Feedbacks, feature requests, and contribution are welcome!
+
+## Go Bindings and Non-blocking Export
+
+This fork of stella_vslam adds support for Go language bindings via CGO. Key additions include:
+
+- **Non-blocking export API**: New methods to export map database to memory bytes without blocking the tracking process:
+  - `export_map_database_bytes()` - exports current map database to msgpack bytes in memory
+  - `pause_map_update()` - pauses LocalMapping and LoopClosing threads
+  - `resume_map_update()` - resumes LocalMapping and LoopClosing threads
+
+- **Go integration**: The functionality is designed to work with a "vslam-daemon" wrapper that uses CGO to interface with the C++ code.
+
+To compile with Go support, use the compilation flag `STELLA_VSLAM_NONBLOCKING_EXPORT` as described in the NONBLOCKING_EXPORT.md file.
 
 ## License
 
