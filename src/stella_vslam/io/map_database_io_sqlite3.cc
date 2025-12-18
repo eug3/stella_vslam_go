@@ -2,6 +2,7 @@
 #include "stella_vslam/data/keyframe.h"
 #include "stella_vslam/data/landmark.h"
 #include "stella_vslam/data/camera_database.h"
+#include "stella_vslam/data/orb_params_database.h"
 #include "stella_vslam/data/bow_database.h"
 #include "stella_vslam/data/map_database.h"
 #include "stella_vslam/io/map_database_io_sqlite3.h"
@@ -141,6 +142,33 @@ bool map_database_io_sqlite3::load_stats(sqlite3* db, data::map_database* map_db
     map_db->next_landmark_id_ = sqlite3_column_int64(stmt, 3);
     sqlite3_finalize(stmt);
     return ret == SQLITE_ROW;
+}
+
+
+bool map_database_io_sqlite3::save_to_bytes(std::vector<uint8_t>& out,
+                                             const data::camera_database* const cam_db,
+                                             const data::orb_params_database* const orb_params_db,
+                                             const data::map_database* const map_db) {
+    std::lock_guard<std::mutex> lock(data::map_database::mtx_database_);
+    
+    // 使用返回值的 to_json API
+    nlohmann::json cameras = cam_db->to_json();
+    nlohmann::json orb_params = orb_params_db->to_json();
+    
+    // map_database::to_json 需要两个 json& 引用参数
+    nlohmann::json keyframes;
+    nlohmann::json landmarks;
+    map_db->to_json(keyframes, landmarks);
+    
+    nlohmann::json json_root;
+    json_root["cameras"] = cameras;
+    json_root["orb_params"] = orb_params;
+    json_root["keyframes"] = keyframes;
+    json_root["landmarks"] = landmarks;
+    
+    // SQLite3 backend 也可以用 msgpack 格式返回字节
+    out = nlohmann::json::to_msgpack(json_root);
+    return true;
 }
 
 } // namespace io

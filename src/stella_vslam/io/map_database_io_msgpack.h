@@ -37,6 +37,14 @@ public:
               const data::map_database* const map_db) override;
 
     /**
+     * Save map database to memory buffer (non-blocking export)
+     */
+    bool save_to_bytes(std::vector<uint8_t>& out,
+                       const data::camera_database* const cam_db,
+                       const data::orb_params_database* const orb_params_db,
+                       const data::map_database* const map_db) override;
+
+    /**
      * Load the map database from MessagePack
      */
     bool load(const std::string& path,

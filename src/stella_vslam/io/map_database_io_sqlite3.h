@@ -31,7 +31,7 @@ public:
     virtual ~map_database_io_sqlite3() = default;
 
     /**
-     * Save the map database as MessagePack
+     * Save the map database as SQLite3
      */
     bool save(const std::string& path,
               const data::camera_database* const cam_db,
@@ -39,7 +39,15 @@ public:
               const data::map_database* const map_db) override;
 
     /**
-     * Load the map database from MessagePack
+     * Save map database to memory buffer (non-blocking export)
+     */
+    bool save_to_bytes(std::vector<uint8_t>& out,
+                       const data::camera_database* const cam_db,
+                       const data::orb_params_database* const orb_params_db,
+                       const data::map_database* const map_db) override;
+
+    /**
+     * Load the map database from SQLite3
      */
     bool load(const std::string& path,
               data::camera_database* cam_db,
@@ -48,6 +56,7 @@ public:
               data::bow_database* bow_db,
               data::bow_vocabulary* bow_vocab) override;
 
+private:
 private:
     bool save_stats(sqlite3* db, const data::map_database* map_db) const;
     bool load_stats(sqlite3* db, data::map_database* map_db) const;

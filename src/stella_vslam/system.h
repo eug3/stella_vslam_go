@@ -85,6 +85,21 @@ public:
     //! Save the map database to file
     bool save_map_database(const std::string& path) const;
 
+    /**
+     * Export map database to memory bytes (non-blocking)
+     */
+    bool export_map_database_bytes(std::vector<uint8_t>& out) const;
+
+    /**
+     * Pause mapping and loop closing (for consistent export)
+     */
+    void pause_map_update();
+
+    /**
+     * Resume mapping and loop closing
+     */
+    void resume_map_update();
+
     //! Get the map publisher
     const std::shared_ptr<publish::map_publisher> get_map_publisher() const;
 

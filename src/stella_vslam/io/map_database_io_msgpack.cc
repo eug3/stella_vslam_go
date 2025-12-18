@@ -103,5 +103,33 @@ bool map_database_io_msgpack::load(const std::string& path,
     return true;
 }
 
+
+bool map_database_io_msgpack::save_to_bytes(std::vector<uint8_t>& out,
+                                             const data::camera_database* const cam_db,
+                                             const data::orb_params_database* const orb_params_db,
+                                             const data::map_database* const map_db) {
+    std::lock_guard<std::mutex> lock(data::map_database::mtx_database_);
+    
+    // 使用返回值的 to_json API（不是传引用）
+    nlohmann::json cameras = cam_db->to_json();
+    nlohmann::json orb_params = orb_params_db->to_json();
+    
+    // map_database::to_json 需要两个 json& 引用参数
+    nlohmann::json keyframes;
+    nlohmann::json landmarks;
+    map_db->to_json(keyframes, landmarks);
+    
+    nlohmann::json json_root;
+    json_root["cameras"] = cameras;
+    json_root["orb_params"] = orb_params;
+    json_root["keyframes"] = keyframes;
+    json_root["landmarks"] = landmarks;
+    
+    // 序列化为 msgpack
+    out = nlohmann::json::to_msgpack(json_root);
+    return true;
+}
+
+
 } // namespace io
 } // namespace stella_vslam

@@ -4,11 +4,14 @@
 #include "stella_vslam/data/bow_vocabulary.h"
 
 #include <string>
+#include <vector>
+#include <cstdint>
 
 namespace stella_vslam {
 
 namespace data {
 class camera_database;
+class orb_params_database;
 class bow_database;
 class map_database;
 } // namespace data
@@ -24,6 +27,16 @@ public:
                       const data::camera_database* const cam_db,
                       const data::orb_params_database* const orb_params_db,
                       const data::map_database* const map_db)
+        = 0;
+
+    /**
+     * Save the map database to memory bytes (msgpack format)
+     * Non-blocking export support: serialize to memory instead of file
+     */
+    virtual bool save_to_bytes(std::vector<uint8_t>& out,
+                               const data::camera_database* const cam_db,
+                               const data::orb_params_database* const orb_params_db,
+                               const data::map_database* const map_db)
         = 0;
 
     /**

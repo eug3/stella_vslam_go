@@ -700,4 +700,21 @@ void system::resume_other_threads() const {
     }
 }
 
+
+bool system::export_map_database_bytes(std::vector<uint8_t>& out) const {
+    pause_other_threads();
+    const bool ret = map_database_io_->save_to_bytes(out, cam_db_, orb_params_db_, map_db_);
+    resume_other_threads();
+    return ret;
+}
+
+void system::pause_map_update() {
+    pause_other_threads();
+}
+
+void system::resume_map_update() {
+    resume_other_threads();
+}
+
+
 } // namespace stella_vslam
